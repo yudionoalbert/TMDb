@@ -4,14 +4,27 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import com.example.tmdb.viewmodels.TmdbViewModel
 import kotlinx.android.synthetic.main.activity_main.toolbar
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var tmdbViewModel: TmdbViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        tmdbViewModel = ViewModelProviders.of(this).get(TmdbViewModel::class.java)
+        tmdbViewModel.fetchMovies()
+
+        tmdbViewModel.popularMoviesLiveData.observe(this, Observer {
+
+            //TODO - Your Update UI Logic
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
