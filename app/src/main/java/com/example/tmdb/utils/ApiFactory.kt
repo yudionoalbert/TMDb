@@ -1,9 +1,11 @@
 package com.example.tmdb.utils
 
+import com.example.tmdb.BuildConfig
 import com.example.tmdb.api.TmdbApi
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
@@ -12,6 +14,7 @@ object ApiFactory {
     val tmdbApi: TmdbApi
     private val authInterceptor: Interceptor
     private val tmdbClient: OkHttpClient
+    private val loggingInterceptor: Interceptor
 
     init {
         authInterceptor = Interceptor { chain ->
@@ -28,9 +31,21 @@ object ApiFactory {
             chain.proceed(newRequest)
         }
 
-        tmdbClient = OkHttpClient().newBuilder()
-            .addInterceptor(authInterceptor)
-            .build()
+        loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        tmdbClient = if (BuildConfig.DEBUG) {
+            OkHttpClient().newBuilder()
+                .addInterceptor(authInterceptor)
+                .addInterceptor(loggingInterceptor)
+                .build()
+        } else {
+            OkHttpClient().newBuilder()
+                .addInterceptor(loggingInterceptor)
+                .addInterceptor(authInterceptor)
+                .build()
+        }
 
         tmdbApi = initRetrofit().create(TmdbApi::class.java)
     }
