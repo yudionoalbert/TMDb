@@ -6,6 +6,9 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.tmdb.ui.MovieAdapter
 import com.example.tmdb.viewmodels.TmdbViewModel
 import kotlinx.android.synthetic.main.activity_main.toolbar
 
@@ -22,8 +25,12 @@ class MainActivity : AppCompatActivity() {
         tmdbViewModel.fetchMovies()
 
         tmdbViewModel.popularMoviesLiveData.observe(this, Observer {
-
-            //TODO - Your Update UI Logic
+            it?.let {
+                findViewById<RecyclerView>(R.id.rcv_movies).apply {
+                    layoutManager = LinearLayoutManager(this@MainActivity)
+                    adapter = MovieAdapter(it)
+                }
+            }
         })
     }
 
